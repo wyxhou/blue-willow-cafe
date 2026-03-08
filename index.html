@@ -901,8 +901,207 @@ menu.forEach(item => {
 });
 
 // ── BUILD SOUNDS ───────────────────────────────────────────────────────────
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let audioCtx = null;
 const activeSounds = {};
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function makeNoise(seconds, amplitude) {
+  const ctx = getAudioCtx();
+  const buf = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * amplitude;
+  return buf;
+}
+
+function generateSound(type, gainNode) {
+  const ctx = getAudioCtx();
+  const stopFns = [];
+
+  if (type === 'rain') {
+    // Layered bandpass noise — gentle patter
+    [800, 1600, 3200].forEach((freq, i) => {
+      const src = ctx.createBufferSource();
+      src.buffer = makeNoise(3, 0.8); src.loop = true;
+      const filt = ctx.createBiquadFilter();
+      filt.type = 'bandpass'; filt.frequency.value = freq; filt.Q.value = 0.5;
+      const g = ctx.createGain(); g.gain.value = 0.18 - i * 0.04;
+      src.connect(filt); filt.connect(g); g.connect(gainNode);
+      src.start();
+      stopFns.push(() => { try { src.stop(); } catch(e){} });
+    });
+  }
+
+  else if (type === 'fire') {
+    // Low rumble + crackle
+    const src = ctx.createBufferSource();
+    src.buffer = makeNoise(4, 1); src.loop = true;
+    const low = ctx.createBiquadFilter();
+    low.type = 'lowpass'; low.frequency.value = 180;
+    const g = ctx.createGain(); g.gain.value = 0.35;
+    // Slow amplitude LFO for flickering
+    const lfo = ctx.createOscillator();
+    const lfoG = ctx.createGain();
+    lfo.frequency.value = 0.8; lfoG.gain.value = 0.12;
+    lfo.connect(lfoG); lfoG.connect(g.gain);
+    src.connect(low); low.connect(g); g.connect(gainNode);
+    lfo.start(); src.start();
+    // Occasional crackle
+    const crackle = setInterval(() => {
+      const csrc = ctx.createBufferSource();
+      csrc.buffer = makeNoise(0.08, 1);
+      const cfilt = ctx.createBiquadFilter();
+      cfilt.type = 'highpass'; cfilt.frequency.value = 1000;
+      const cg = ctx.createGain(); cg.gain.value = 0.06;
+      csrc.connect(cfilt); cfilt.connect(cg); cg.connect(gainNode);
+      csrc.start();
+    }, 800 + Math.random() * 1200);
+    stopFns.push(() => { try { src.stop(); lfo.stop(); } catch(e){} clearInterval(crackle); });
+  }
+
+  else if (type === 'wind') {
+    const src = ctx.createBufferSource();
+    src.buffer = makeNoise(5, 1); src.loop = true;
+    const filt = ctx.createBiquadFilter();
+    filt.type = 'bandpass'; filt.frequency.value = 350; filt.Q.value = 1.2;
+    const g = ctx.createGain(); g.gain.value = 0.22;
+    const lfo = ctx.createOscillator();
+    const lfoG = ctx.createGain();
+    lfo.frequency.value = 0.12; lfoG.gain.value = 200;
+    lfo.connect(lfoG); lfoG.connect(filt.frequency);
+    // Gain LFO for gusts
+    const lfo2 = ctx.createOscillator();
+    const lfo2G = ctx.createGain();
+    lfo2.frequency.value = 0.07; lfo2G.gain.value = 0.1;
+    lfo2.connect(lfo2G); lfo2G.connect(g.gain);
+    src.connect(filt); filt.connect(g); g.connect(gainNode);
+    lfo.start(); lfo2.start(); src.start();
+    stopFns.push(() => { try { src.stop(); lfo.stop(); lfo2.stop(); } catch(e){} });
+  }
+
+  else if (type === 'brew') {
+    // Bubbling / percolating
+    const src = ctx.createBufferSource();
+    src.buffer = makeNoise(2, 0.5); src.loop = true;
+    const filt = ctx.createBiquadFilter();
+    filt.type = 'bandpass'; filt.frequency.value = 600; filt.Q.value = 2;
+    const g = ctx.createGain(); g.gain.value = 0.15;
+    src.connect(filt); filt.connect(g); g.connect(gainNode);
+    src.start();
+    // Occasional bubble pop
+    const bubbles = setInterval(() => {
+      const osc = ctx.createOscillator();
+      const og = ctx.createGain();
+      osc.frequency.value = 300 + Math.random() * 400;
+      og.gain.setValueAtTime(0.06, ctx.currentTime);
+      og.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+      osc.connect(og); og.connect(gainNode);
+      osc.start(); osc.stop(ctx.currentTime + 0.18);
+    }, 400 + Math.random() * 600);
+    stopFns.push(() => { try { src.stop(); } catch(e){} clearInterval(bubbles); });
+  }
+
+  else if (type === 'chatter') {
+    // Multiple detuned noise bands simulating murmur
+    [250, 380, 180, 420, 300].forEach((freq, i) => {
+      const src = ctx.createBufferSource();
+      src.buffer = makeNoise(3, 0.3); src.loop = true;
+      const filt = ctx.createBiquadFilter();
+      filt.type = 'bandpass'; filt.frequency.value = freq; filt.Q.value = 4;
+      const g = ctx.createGain(); g.gain.value = 0.06;
+      const lfo = ctx.createOscillator();
+      const lfoG = ctx.createGain();
+      lfo.frequency.value = 1.5 + i * 0.4 + Math.random(); lfoG.gain.value = 0.04;
+      lfo.connect(lfoG); lfoG.connect(g.gain);
+      src.connect(filt); filt.connect(g); g.connect(gainNode);
+      lfo.start(); src.start();
+      stopFns.push(() => { try { src.stop(); lfo.stop(); } catch(e){} });
+    });
+  }
+
+  else if (type === 'jazz') {
+    // Gentle plucked notes in a warm scale
+    const scale = [196, 220, 246.9, 261.6, 293.7, 329.6, 369.9, 392, 440, 493.9];
+    let running = true;
+    const playNote = () => {
+      if (!running) return;
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'triangle';
+      const baseFreq = scale[Math.floor(Math.random() * scale.length)];
+      osc.frequency.value = baseFreq * (Math.random() > 0.3 ? 1 : 2);
+      const now = ctx.currentTime;
+      g.gain.setValueAtTime(0, now);
+      g.gain.linearRampToValueAtTime(0.055, now + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+      osc.connect(g); g.connect(gainNode);
+      osc.start(now); osc.stop(now + 0.75);
+      const delay = 280 + Math.random() * 500;
+      setTimeout(playNote, delay);
+    };
+    playNote();
+    stopFns.push(() => { running = false; });
+  }
+
+  else if (type === 'pages') {
+    let running = true;
+    const playPage = () => {
+      if (!running) return;
+      // Short filtered noise burst
+      const buf = ctx.createBuffer(1, ctx.sampleRate * 0.12, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < data.length; i++) {
+        const t = i / ctx.sampleRate;
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-t * 30) * 0.8;
+      }
+      const src = ctx.createBufferSource(); src.buffer = buf;
+      const filt = ctx.createBiquadFilter();
+      filt.type = 'highpass'; filt.frequency.value = 3000;
+      const g = ctx.createGain(); g.gain.value = 0.25;
+      src.connect(filt); filt.connect(g); g.connect(gainNode);
+      src.start();
+      const next = 2500 + Math.random() * 4000;
+      setTimeout(playPage, next);
+    };
+    playPage();
+    stopFns.push(() => { running = false; });
+  }
+
+  else if (type === 'keys') {
+    let running = true;
+    const playKey = () => {
+      const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.04), ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < data.length; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.015)) * 0.7;
+      }
+      const src = ctx.createBufferSource(); src.buffer = buf;
+      const filt = ctx.createBiquadFilter();
+      filt.type = 'bandpass'; filt.frequency.value = 1800; filt.Q.value = 1;
+      const g = ctx.createGain(); g.gain.value = 0.3;
+      src.connect(filt); filt.connect(g); g.connect(gainNode);
+      src.start();
+    };
+    const scheduleTyping = () => {
+      if (!running) return;
+      const burst = Math.floor(Math.random() * 6) + 2;
+      for (let i = 0; i < burst; i++) {
+        setTimeout(playKey, i * (60 + Math.random() * 60));
+      }
+      setTimeout(scheduleTyping, 600 + Math.random() * 1400);
+    };
+    scheduleTyping();
+    stopFns.push(() => { running = false; });
+  }
+
+  return stopFns;
+}
 
 const soundsGrid = document.getElementById('soundsGrid');
 sounds.forEach(s => {
@@ -921,150 +1120,25 @@ sounds.forEach(s => {
   soundsGrid.appendChild(btn);
 });
 
-function generateSound(type, gainNode) {
-  const nodes = [];
-
-  if (type === 'rain') {
-    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 2, audioCtx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.4;
-    const src = audioCtx.createBufferSource();
-    src.buffer = buf; src.loop = true;
-    const filt = audioCtx.createBiquadFilter();
-    filt.type = 'bandpass'; filt.frequency.value = 1200; filt.Q.value = 0.3;
-    src.connect(filt); filt.connect(gainNode); src.start();
-    nodes.push(src, filt);
-  }
-
-  else if (type === 'fire') {
-    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 3, audioCtx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.3;
-    const src = audioCtx.createBufferSource();
-    src.buffer = buf; src.loop = true;
-    const filt = audioCtx.createBiquadFilter();
-    filt.type = 'lowpass'; filt.frequency.value = 300;
-    src.connect(filt); filt.connect(gainNode); src.start();
-    nodes.push(src, filt);
-  }
-
-  else if (type === 'wind') {
-    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 4, audioCtx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.2;
-    const src = audioCtx.createBufferSource();
-    src.buffer = buf; src.loop = true;
-    const filt = audioCtx.createBiquadFilter();
-    filt.type = 'bandpass'; filt.frequency.value = 400; filt.Q.value = 0.8;
-    const lfo = audioCtx.createOscillator();
-    const lfoG = audioCtx.createGain();
-    lfo.frequency.value = 0.15; lfoG.gain.value = 150;
-    lfo.connect(lfoG); lfoG.connect(filt.frequency);
-    lfo.start(); src.connect(filt); filt.connect(gainNode); src.start();
-    nodes.push(src, filt, lfo, lfoG);
-  }
-
-  else if (type === 'brew') {
-    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 2, audioCtx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.15;
-    const src = audioCtx.createBufferSource();
-    src.buffer = buf; src.loop = true;
-    const filt = audioCtx.createBiquadFilter();
-    filt.type = 'highpass'; filt.frequency.value = 800;
-    src.connect(filt); filt.connect(gainNode); src.start();
-    nodes.push(src, filt);
-  }
-
-  else if (type === 'chatter') {
-    [200, 320, 280, 240].forEach((freq, i) => {
-      const osc = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      osc.type = 'sine'; osc.frequency.value = freq;
-      g.gain.value = 0.015;
-      const lfo = audioCtx.createOscillator();
-      const lfoG = audioCtx.createGain();
-      lfo.frequency.value = 2.5 + i * 0.8; lfoG.gain.value = 0.012;
-      lfo.connect(lfoG); lfoG.connect(g.gain);
-      osc.connect(g); g.connect(gainNode);
-      lfo.start(); osc.start();
-      nodes.push(osc, g, lfo, lfoG);
-    });
-  }
-
-  else if (type === 'jazz') {
-    const jazzNotes = [220, 261.6, 293.7, 329.6, 349.2, 392, 440];
-    let noteIdx = 0;
-    const playNote = () => {
-      const osc = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.value = jazzNotes[Math.floor(Math.random() * jazzNotes.length)] * (Math.random() > 0.5 ? 2 : 1);
-      g.gain.setValueAtTime(0, audioCtx.currentTime);
-      g.gain.linearRampToValueAtTime(0.04, audioCtx.currentTime + 0.05);
-      g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.4);
-      osc.connect(g); g.connect(gainNode);
-      osc.start(); osc.stop(audioCtx.currentTime + 0.5);
-    };
-    const interval = setInterval(playNote, 400 + Math.random() * 600);
-    nodes.push({ stop: () => clearInterval(interval) });
-  }
-
-  else if (type === 'pages') {
-    const playPage = () => {
-      const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.15, audioCtx.sampleRate);
-      const data = buf.getChannelData(0);
-      for (let i = 0; i < data.length; i++) {
-        const t = i / audioCtx.sampleRate;
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-t * 20) * 0.4;
-      }
-      const src = audioCtx.createBufferSource();
-      src.buffer = buf;
-      const filt = audioCtx.createBiquadFilter();
-      filt.type = 'highpass'; filt.frequency.value = 2000;
-      src.connect(filt); filt.connect(gainNode); src.start();
-    };
-    const interval = setInterval(playPage, 3000 + Math.random() * 4000);
-    nodes.push({ stop: () => clearInterval(interval) });
-  }
-
-  else if (type === 'keys') {
-    const playKey = () => {
-      const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.05, audioCtx.sampleRate);
-      const data = buf.getChannelData(0);
-      for (let i = 0; i < data.length; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioCtx.sampleRate * 0.02)) * 0.3;
-      }
-      const src = audioCtx.createBufferSource();
-      src.buffer = buf;
-      src.connect(gainNode); src.start();
-    };
-    const interval = setInterval(() => {
-      const burst = Math.floor(Math.random() * 5) + 1;
-      for (let i = 0; i < burst; i++) setTimeout(playKey, i * 80);
-    }, 800 + Math.random() * 1200);
-    nodes.push({ stop: () => clearInterval(interval) });
-  }
-
-  return nodes;
-}
-
 function toggleSound(s) {
-  audioCtx.resume();
+  const ctx = getAudioCtx();
   const btn = document.getElementById('snd-' + s.id);
 
   if (activeSounds[s.id]) {
-    activeSounds[s.id].nodes.forEach(n => { try { n.stop ? n.stop() : n.disconnect(); } catch(e){} });
-    activeSounds[s.id].gain.disconnect();
+    // Stop all stop functions
+    activeSounds[s.id].stopFns.forEach(fn => { try { fn(); } catch(e){} });
+    activeSounds[s.id].gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+    setTimeout(() => { try { activeSounds[s.id].gain.disconnect(); } catch(e){} }, 400);
     delete activeSounds[s.id];
     btn.classList.remove('active');
   } else {
-    const gainNode = audioCtx.createGain();
+    const gainNode = ctx.createGain();
     const vol = btn.querySelector('.vol-slider').value / 100;
-    gainNode.gain.value = vol * 0.5;
-    gainNode.connect(audioCtx.destination);
-    const nodes = generateSound(s.type, gainNode);
-    activeSounds[s.id] = { nodes, gain: gainNode };
+    gainNode.gain.value = 0;
+    gainNode.gain.linearRampToValueAtTime(vol * 0.55, ctx.currentTime + 0.5);
+    gainNode.connect(ctx.destination);
+    const stopFns = generateSound(s.type, gainNode);
+    activeSounds[s.id] = { stopFns, gain: gainNode };
     btn.classList.add('active');
   }
 
@@ -1073,7 +1147,7 @@ function toggleSound(s) {
 
 function setVolume(id, val) {
   if (activeSounds[id]) {
-    activeSounds[id].gain.gain.value = (val / 100) * 0.5;
+    activeSounds[id].gain.gain.value = (val / 100) * 0.55;
   }
 }
 
