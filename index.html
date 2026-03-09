@@ -1,796 +1,606 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Blue Willow ☕</title>
-
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232c3a4a'/%3E%3Ctext x='7' y='23' font-size='18'%3E☕%3C/text%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=Dancing+Script:wght@500;600;700&family=Petit+Formal+Script&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:         #1e2530;
-    --window-sky: #2a3545;
-    --rain-col:   rgba(140,170,200,0.18);
-    --warm:       #f5ead8;
-    --warm-dim:   #c8b89a;
-    --warm-mid:   #9a8070;
-    --amber:      #d4956a;
-    --amber-pale: #e8c8a8;
-    --wood:       #3d2e22;
-    --wood-light: #5a4030;
-    --card-bg:    rgba(245,234,216,0.06);
-    --card-border:rgba(200,184,154,0.18);
-    --steam:      rgba(245,234,216,0.55);
-    --shadow:     rgba(0,0,0,0.4);
-  }
-
-  * { margin:0; padding:0; box-sizing:border-box; }
-
-  body {
-    background: var(--bg);
-    min-height: 100vh;
-    font-family: 'Lora', serif;
-    color: var(--warm);
-    overflow-x: hidden;
-  }
-
-  /* ── SCENE WRAPPER ───────────────────────────────────────────────────── */
-  .scene {
-    position: relative;
-    min-height: 100vh;
-    display: grid;
-    grid-template-columns: 1fr 380px;
-    grid-template-rows: auto 1fr auto;
-  }
-
-  /* ── RAINY WINDOW ────────────────────────────────────────────────────── */
-  .window-panel {
-    grid-column: 1;
-    grid-row: 1 / -1;
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(180deg,
-      #1a2535 0%, #1e2d40 40%, #253040 70%, #1e2535 100%);
-  }
-
-  /* Window frame */
-  .window-frame {
-    position: absolute;
-    inset: 40px 60px 40px 40px;
-    border: 12px solid var(--wood-light);
-    border-radius: 4px;
-    overflow: hidden;
-    box-shadow:
-      inset 0 0 40px rgba(0,0,0,0.5),
-      0 0 0 4px var(--wood),
-      0 8px 40px rgba(0,0,0,0.6);
-  }
-
-  .window-sky {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg,
-      #141e2e 0%, #1a2840 30%, #1e2f45 60%, #253040 100%);
-  }
-
-  /* Fog / mist layers */
-  .fog {
-    position: absolute;
-    bottom: 0; left: -20%; right: -20%;
-    height: 35%;
-    background: linear-gradient(to top,
-      rgba(150,170,190,0.12) 0%,
-      transparent 100%);
-    animation: fogDrift 18s ease-in-out infinite alternate;
-  }
-
-  .fog2 {
-    position: absolute;
-    bottom: 10%; left: -30%; right: -30%;
-    height: 25%;
-    background: linear-gradient(to top,
-      rgba(130,155,175,0.07) 0%, transparent 100%);
-    animation: fogDrift 24s ease-in-out infinite alternate-reverse;
-  }
-
-  @keyframes fogDrift {
-    from { transform: translateX(-5%); }
-    to   { transform: translateX(5%); }
-  }
-
-  /* City silhouette */
-  .city {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 45%;
-    background:
-      linear-gradient(to top, #0d141e 60%, transparent 100%);
-  }
-
-  .city::before {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 100%;
-    background: #0d141e;
-    clip-path: polygon(
-      0% 100%, 0% 65%, 3% 65%, 3% 45%, 5% 45%, 5% 65%,
-      8% 65%, 8% 30%, 10% 30%, 10% 65%,
-      13% 65%, 13% 50%, 15% 50%, 15% 40%, 17% 40%, 17% 50%, 18% 50%,
-      18% 65%, 21% 65%, 21% 35%, 23% 35%, 23% 65%,
-      26% 65%, 26% 55%, 28% 55%, 28% 65%,
-      31% 65%, 31% 42%, 33% 42%, 33% 65%,
-      36% 65%, 36% 48%, 38% 48%, 38% 38%, 40% 38%, 40% 48%, 41% 48%,
-      41% 65%, 44% 65%, 44% 52%, 46% 52%, 46% 65%,
-      49% 65%, 49% 38%, 51% 38%, 51% 65%,
-      54% 65%, 54% 55%, 56% 55%, 56% 45%, 58% 45%, 58% 55%, 59% 55%,
-      59% 65%, 62% 65%, 62% 42%, 64% 42%, 64% 65%,
-      67% 65%, 67% 50%, 69% 50%, 69% 65%,
-      72% 65%, 72% 35%, 74% 35%, 74% 65%,
-      77% 65%, 77% 48%, 79% 48%, 79% 65%,
-      82% 65%, 82% 55%, 84% 55%, 84% 65%,
-      87% 65%, 87% 40%, 89% 40%, 89% 65%,
-      92% 65%, 92% 52%, 94% 52%, 94% 65%,
-      97% 65%, 97% 60%, 100% 60%, 100% 100%
-    );
-  }
-
-  /* Tiny glowing windows in city */
-  .city-lights {
-    position: absolute;
-    bottom: 0; left: 0; right: 0; top: 0;
-  }
-
-  .city-light {
-    position: absolute;
-    width: 2px; height: 2px;
-    border-radius: 1px;
-    animation: lightBlink ease-in-out infinite;
-  }
-
-  @keyframes lightBlink {
-    0%,100%{ opacity:0.7; }
-    50%    { opacity:0.2; }
-  }
-
-  /* Rain canvas */
-  #rainCanvas {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.7;
-  }
-
-  /* Condensation drops on glass */
-  .condensation {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-
-  .drop {
-    position: absolute;
-    background: linear-gradient(to bottom, rgba(180,210,230,0.5), rgba(140,180,210,0.2));
-    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    animation: dropRun linear infinite;
-  }
-
-  @keyframes dropRun {
-    0%   { transform: translateY(0) scaleY(1); opacity: 0; }
-    10%  { opacity: 1; }
-    70%  { transform: translateY(60vh) scaleY(1.4); opacity: 0.6; }
-    100% { transform: translateY(90vh) scaleY(0.8); opacity: 0; }
-  }
-
-  /* Reflection of room on glass */
-  .window-reflection {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg,
-      rgba(210,150,80,0.04) 0%,
-      transparent 50%,
-      rgba(210,150,80,0.02) 100%);
-    pointer-events: none;
-  }
-
-  /* Cross divider in window */
-  .window-cross-h {
-    position: absolute;
-    top: 50%; left: 0; right: 0;
-    height: 10px;
-    background: var(--wood-light);
-    transform: translateY(-50%);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  }
-
-  .window-cross-v {
-    position: absolute;
-    left: 50%; top: 0; bottom: 0;
-    width: 10px;
-    background: var(--wood-light);
-    transform: translateX(-50%);
-    box-shadow: 2px 0 8px rgba(0,0,0,0.4);
-  }
-
-  /* Windowsill */
-  .windowsill {
-    position: absolute;
-    bottom: 20px; left: 20px; right: 40px;
-    height: 28px;
-    background: linear-gradient(to bottom, var(--wood-light), var(--wood));
-    border-radius: 3px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-  }
-
-  /* Plant on sill */
-  .plant {
-    position: absolute;
-    bottom: 46px; right: 80px;
-    font-size: 2rem;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
-    animation: plantSway 6s ease-in-out infinite;
-    transform-origin: bottom center;
-  }
-
-  @keyframes plantSway {
-    0%,100% { transform: rotate(-2deg); }
-    50%     { transform: rotate(2deg); }
-  }
-
-  /* Candle on sill */
-  .candle-wrap {
-    position: absolute;
-    bottom: 46px; left: 80px;
-  }
-
-  .candle-body {
-    width: 12px; height: 30px;
-    background: linear-gradient(to right, #e8d5b0, #f5e8cc, #e0c898);
-    border-radius: 2px 2px 1px 1px;
-    position: relative;
-  }
-
-  .candle-flame {
-    position: absolute;
-    top: -14px; left: 50%;
-    transform: translateX(-50%);
-    width: 8px; height: 14px;
-    background: radial-gradient(ellipse at 50% 80%, #fff 0%, #ffd060 30%, #ff9020 70%, transparent 100%);
-    border-radius: 50% 50% 30% 30%;
-    animation: flameDance 1.5s ease-in-out infinite;
-    filter: blur(0.5px);
-  }
-
-  .candle-glow {
-    position: absolute;
-    top: -20px; left: 50%;
-    transform: translateX(-50%);
-    width: 40px; height: 40px;
-    background: radial-gradient(circle, rgba(255,200,60,0.3) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: glowPulse 1.5s ease-in-out infinite;
-  }
-
-  @keyframes flameDance {
-    0%,100% { transform: translateX(-50%) scaleX(1) rotate(-2deg); }
-    33%     { transform: translateX(-52%) scaleX(0.85) rotate(3deg); }
-    66%     { transform: translateX(-48%) scaleX(1.1) rotate(-1deg); }
-  }
-
-  @keyframes glowPulse {
-    0%,100% { opacity:0.8; transform: translateX(-50%) scale(1); }
-    50%     { opacity:1; transform: translateX(-50%) scale(1.2); }
-  }
-
-  /* ── RIGHT PANEL — MENU & SOUNDS ─────────────────────────────────────── */
-  .right-panel {
-    grid-column: 2;
-    grid-row: 1 / -1;
-    background: linear-gradient(180deg, #2a1f18 0%, #221a14 100%);
-    border-left: 3px solid var(--wood);
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    position: relative;
-    z-index: 10;
-    box-shadow: -8px 0 40px rgba(0,0,0,0.5);
-  }
-
-  .right-panel::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      transparent, transparent 27px,
-      rgba(200,180,140,0.04) 27px, rgba(200,180,140,0.04) 28px
-    );
-    pointer-events: none;
-  }
-
-  /* Header */
-  .cafe-header {
-    padding: 32px 28px 24px;
-    border-bottom: 1px solid rgba(200,180,140,0.15);
-    position: relative;
-  }
-
-  .cafe-name {
-    font-family: 'Dancing Script', cursive;
-    font-size: 2rem;
-    color: var(--amber-pale);
-    line-height: 1;
-    margin-bottom: 4px;
-    text-shadow: 0 2px 12px rgba(212,149,106,0.4);
-  }
-
-  .cafe-tagline {
-    font-family: 'Lora', serif;
-    font-style: italic;
-    font-size: 0.78rem;
-    color: var(--warm-mid);
-    letter-spacing: 0.04em;
-  }
-
-  /* Note card */
-  .table-note {
-    margin: 20px 20px 0;
-    background: rgba(245,230,200,0.08);
-    border: 1px solid rgba(200,180,140,0.2);
-    border-radius: 3px;
-    padding: 16px 18px;
-    position: relative;
-  }
-
-  .table-note::before {
-    content: '📝';
-    position: absolute;
-    top: -10px; left: 14px;
-    font-size: 0.9rem;
-  }
-
-  .note-text {
-    font-family: 'Dancing Script', cursive;
-    font-size: 0.92rem;
-    line-height: 1.7;
-    color: var(--amber-pale);
-  }
-
-  .note-sign {
-    font-family: 'Dancing Script', cursive;
-    font-size: 0.8rem;
-    color: var(--warm-mid);
-    text-align: right;
-    margin-top: 6px;
-  }
-
-  /* Section labels */
-  .section-label {
-    font-family: 'Lora', serif;
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--warm-mid);
-    padding: 20px 24px 10px;
-    opacity: 0.8;
-  }
-
-  /* Menu */
-  .menu-list {
-    padding: 0 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .menu-item {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 4px;
-    padding: 12px 14px;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s, transform 0.15s;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .menu-item:hover {
-    background: rgba(245,234,216,0.1);
-    border-color: rgba(212,149,106,0.35);
-    transform: translateX(2px);
-  }
-
-  .menu-item:active { transform: translateX(4px) scale(0.99); }
-
-  .menu-emoji { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
-
-  .menu-info { flex: 1; }
-
-  .menu-name {
-    font-family: 'Lora', serif;
-    font-size: 0.88rem;
-    color: var(--amber-pale);
-    margin-bottom: 3px;
-  }
-
-  .menu-desc {
-    font-family: 'Lora', serif;
-    font-style: italic;
-    font-size: 0.72rem;
-    color: var(--warm-mid);
-    line-height: 1.45;
-  }
-
-  .order-btn {
-    font-size: 0.65rem;
-    font-family: 'Lora', serif;
-    color: var(--amber);
-    opacity: 0;
-    transition: opacity 0.2s;
-    align-self: center;
-    flex-shrink: 0;
-    letter-spacing: 0.05em;
-  }
-
-  .menu-item:hover .order-btn { opacity: 1; }
-
-  /* Sounds section */
-  .sounds-grid {
-    padding: 0 16px 16px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .sound-btn {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 4px;
-    padding: 10px 10px 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .sound-btn:hover {
-    background: rgba(245,234,216,0.1);
-    border-color: rgba(212,149,106,0.3);
-  }
-
-  .sound-btn.active {
-    background: rgba(212,149,106,0.12);
-    border-color: rgba(212,149,106,0.5);
-  }
-
-  .sound-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .sound-label {
-    font-family: 'Lora', serif;
-    font-size: 0.72rem;
-    color: var(--warm);
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .sound-icon { font-size: 0.85rem; }
-
-  .sound-indicator {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--warm-mid);
-    opacity: 0.3;
-    transition: all 0.3s;
-  }
-
-  .sound-btn.active .sound-indicator {
-    background: var(--amber);
-    opacity: 1;
-    box-shadow: 0 0 6px rgba(212,149,106,0.6);
-    animation: soundPulse 1.5s ease-in-out infinite;
-  }
-
-  @keyframes soundPulse {
-    0%,100%{ transform:scale(1); }
-    50%    { transform:scale(1.3); }
-  }
-
-  /* Volume slider */
-  .vol-slider {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 2px;
-    background: rgba(200,180,140,0.2);
-    border-radius: 2px;
-    outline: none;
-  }
-
-  .vol-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: var(--amber);
-    cursor: pointer;
-    transition: transform 0.2s;
-  }
-
-  .vol-slider::-webkit-slider-thumb:hover { transform: scale(1.3); }
-
-  /* ── ORDER SLIP MODAL ─────────────────────────────────────────────────── */
-  .order-overlay {
-    position: fixed; inset: 0;
-    background: rgba(20,15,10,0.75);
-    backdrop-filter: blur(8px);
-    z-index: 100;
-    display: flex; align-items: center; justify-content: center;
-    padding: 20px;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.35s ease;
-  }
-
-  .order-overlay.show { opacity:1; pointer-events:all; }
-
-  .order-slip {
-    max-width: 320px; width: 100%;
-    background: #fdf6e8;
-    border-radius: 3px 3px 8px 8px;
-    padding: 0;
-    transform: translateY(30px) rotate(-1deg);
-    transition: transform 0.45s cubic-bezier(0.34,1.5,0.64,1);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(200,170,120,0.3);
-    overflow: hidden;
-    color: #3a2e22;
-  }
-
-  .order-overlay.show .order-slip {
-    transform: translateY(0) rotate(0deg);
-  }
-
-  /* Thermal receipt style top */
-  .slip-header {
-    background: #3a2e22;
-    color: #fdf6e8;
-    padding: 16px 20px 14px;
-    text-align: center;
-  }
-
-  .slip-cafe {
-    font-family: 'Dancing Script', cursive;
-    font-size: 1.4rem;
-    color: var(--amber-pale);
-    display: block;
-    margin-bottom: 2px;
-  }
-
-  .slip-sub {
-    font-family: 'Lora', serif;
-    font-style: italic;
-    font-size: 0.68rem;
-    color: rgba(245,230,200,0.6);
-    letter-spacing: 0.05em;
-  }
-
-  .slip-body {
-    padding: 20px 22px;
-    border-bottom: 2px dashed rgba(180,155,110,0.35);
-  }
-
-  .slip-for {
-    font-family: 'Lora', serif;
-    font-size: 0.65rem;
-    letter-spacing: 0.15em;
-    color: #8a7060;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-
-  .slip-name {
-    font-family: 'Dancing Script', cursive;
-    font-size: 1.6rem;
-    color: #3a2e22;
-    margin-bottom: 16px;
-    line-height: 1;
-  }
-
-  .slip-drink-row {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-
-  .slip-drink-emoji { font-size: 1.2rem; }
-
-  .slip-drink-name {
-    font-family: 'Lora', serif;
-    font-size: 1rem;
-    color: #3a2e22;
-    font-weight: 500;
-  }
-
-  /* Steam animation inside modal */
-  .slip-steam-wrap {
-    display: flex;
-    justify-content: center;
-    margin: 16px 0 8px;
-    height: 50px;
-    position: relative;
-  }
-
-  .steam-line {
-    position: absolute;
-    bottom: 0;
-    width: 3px;
-    background: linear-gradient(to top, rgba(180,160,130,0.6), transparent);
-    border-radius: 3px;
-    animation: steamRise 2s ease-in-out infinite;
-    filter: blur(1.5px);
-  }
-
-  .steam-line:nth-child(1) { left: 38%; animation-delay: 0s; }
-  .steam-line:nth-child(2) { left: 50%; animation-delay: 0.4s; height: 35px; }
-  .steam-line:nth-child(3) { left: 62%; animation-delay: 0.8s; height: 28px; }
-
-  @keyframes steamRise {
-    0%   { transform: translateY(0) scaleX(1); opacity: 0; }
-    20%  { opacity: 1; }
-    80%  { opacity: 0.5; }
-    100% { transform: translateY(-45px) scaleX(2.5); opacity: 0; }
-  }
-
-  .slip-message {
-    font-family: 'Dancing Script', cursive;
-    font-size: 0.88rem;
-    line-height: 1.6;
-    color: #6a5040;
-    font-style: italic;
-    margin-top: 4px;
-  }
-
-  .slip-footer {
-    padding: 14px 22px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .slip-from {
-    font-family: 'Dancing Script', cursive;
-    font-size: 0.8rem;
-    color: #8a7060;
-  }
-
-  .slip-sign {
-    font-family: 'Dancing Script', cursive;
-    font-size: 1.2rem;
-    color: #3a2e22;
-    border-bottom: 1px solid rgba(100,80,60,0.3);
-    padding-bottom: 2px;
-  }
-
-  .slip-close {
-    display: block;
-    width: 100%;
-    background: #3a2e22;
-    color: var(--amber-pale);
-    border: none;
-    font-family: 'Lora', serif;
-    font-size: 0.72rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    padding: 12px;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-
-  .slip-close:hover { background: #4a3c2c; }
-
-  /* ── AMBIENT LABEL ───────────────────────────────────────────────────── */
-  .ambient-status {
-    position: fixed;
-    bottom: 20px; left: 20px;
-    font-family: 'Dancing Script', cursive;
-    font-size: 0.82rem;
-    color: rgba(200,180,140,0.45);
-    z-index: 5;
-    pointer-events: none;
-    transition: opacity 0.5s;
-  }
-
-  /* ── RESPONSIVE ──────────────────────────────────────────────────────── */
-  @media (max-width: 700px) {
-    .scene {
-      grid-template-columns: 1fr;
-      grid-template-rows: 280px 1fr;
-    }
-    .window-panel { grid-column:1; grid-row:1; }
-    .right-panel  { grid-column:1; grid-row:2; border-left:none; border-top:3px solid var(--wood); }
-  }
-
-  /* Scrollbar */
-  .right-panel::-webkit-scrollbar { width: 4px; }
-  .right-panel::-webkit-scrollbar-track { background: transparent; }
-  .right-panel::-webkit-scrollbar-thumb { background: rgba(200,170,120,0.2); border-radius: 2px; }
+:root {
+  --bg:          #1a1612;
+  --warm:        #f0e6d2;
+  --warm-dim:    #c4ad90;
+  --warm-mid:    #8a7260;
+  --amber:       #c8865a;
+  --amber-pale:  #e0bea0;
+  --wood:        #2e2018;
+  --wood-light:  #4a3228;
+  --card-bg:     rgba(240,230,210,0.05);
+  --card-border: rgba(196,173,144,0.16);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  width:100%; height:100%;
+  overflow: hidden;
+  background: var(--bg);
+  font-family: 'Lora', serif;
+  color: var(--warm);
+}
+
+/* ── LAYOUT: two columns, full viewport ─────────────────────────────────── */
+.scene {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* ── LEFT: WINDOW PANEL ─────────────────────────────────────────────────── */
+.window-panel {
+  position: relative;
+  overflow: hidden;
+  background: #111820;
+}
+
+/* Warm candlelight glow cast from the right (room side) */
+.room-glow {
+  position: absolute;
+  inset: 0; z-index: 6; pointer-events: none;
+  background: radial-gradient(ellipse 60% 80% at 92% 85%,
+    rgba(210,140,60,0.13) 0%, transparent 65%);
+  animation: glowFlicker 3s ease-in-out infinite;
+}
+
+@keyframes glowFlicker {
+  0%,100% { opacity:0.8; }
+  30%     { opacity:1.0; }
+  60%     { opacity:0.65; }
+  80%     { opacity:1.0; }
+}
+
+/* Sky behind glass */
+.sky {
+  position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(180deg,
+    #0c1420 0%, #101a2e 35%, #141f35 65%, #101826 100%);
+}
+
+/* Nebula / cloud wisps */
+.cloud-layer {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(ellipse 50% 30% at 25% 35%, rgba(80,110,160,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 25% at 70% 20%, rgba(60,80,140,0.06) 0%, transparent 70%);
+  animation: cloudDrift 22s ease-in-out infinite alternate;
+}
+@keyframes cloudDrift {
+  from { transform: translateX(-2%); }
+  to   { transform: translateX(2%); }
+}
+
+/* City silhouette */
+.city {
+  position: absolute; bottom: 0; left:0; right:0;
+  height: 42%; z-index: 2;
+}
+.city::before {
+  content:''; position:absolute; inset:0;
+  background: #080e16;
+  clip-path: polygon(
+    0% 100%, 0% 68%, 2% 68%, 2% 48%, 4% 48%, 4% 68%,
+    7% 68%, 7% 32%, 9% 32%, 9% 68%,
+    12% 68%, 12% 52%, 14% 52%, 14% 42%, 16% 42%, 16% 52%, 17% 52%,
+    17% 68%, 20% 68%, 20% 38%, 22% 38%, 22% 68%,
+    25% 68%, 25% 56%, 27% 56%, 27% 68%,
+    30% 68%, 30% 44%, 32% 44%, 32% 68%,
+    35% 68%, 35% 50%, 37% 50%, 37% 40%, 39% 40%, 39% 50%, 40% 50%,
+    40% 68%, 43% 68%, 43% 54%, 45% 54%, 45% 68%,
+    48% 68%, 48% 40%, 50% 40%, 50% 68%,
+    53% 68%, 53% 56%, 55% 56%, 55% 46%, 57% 46%, 57% 56%, 58% 56%,
+    58% 68%, 61% 68%, 61% 44%, 63% 44%, 63% 68%,
+    66% 68%, 66% 52%, 68% 52%, 68% 68%,
+    71% 68%, 71% 36%, 73% 36%, 73% 68%,
+    76% 68%, 76% 50%, 78% 50%, 78% 68%,
+    81% 68%, 81% 56%, 83% 56%, 83% 68%,
+    86% 68%, 86% 42%, 88% 42%, 88% 68%,
+    91% 68%, 91% 54%, 93% 54%, 93% 68%,
+    96% 68%, 96% 62%, 100% 62%, 100% 100%
+  );
+}
+
+/* City window lights */
+.city-lights { position:absolute; inset:0; z-index:3; }
+.city-light {
+  position:absolute; border-radius:1px;
+  animation: blink ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:0.75;} 50%{opacity:0.2;} }
+
+/* Rain canvas */
+#rainCanvas {
+  position:absolute; inset:0; z-index:4; pointer-events:none;
+  width:100%; height:100%;
+}
+
+/* Condensation drops */
+.condensation { position:absolute; inset:0; z-index:5; pointer-events:none; }
+.cdrop {
+  position:absolute;
+  background: linear-gradient(to bottom, rgba(180,210,235,0.55), rgba(140,185,215,0.2));
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: dropFall linear infinite;
+}
+@keyframes dropFall {
+  0%   { transform:translateY(0) scaleY(1); opacity:0; }
+  10%  { opacity:1; }
+  75%  { transform:translateY(55vh) scaleY(1.5); opacity:0.5; }
+  100% { transform:translateY(80vh) scaleY(0.8); opacity:0; }
+}
+
+/* Glass reflection */
+.glass-reflect {
+  position:absolute; inset:0; z-index:5; pointer-events:none;
+  background: linear-gradient(135deg,
+    rgba(210,150,70,0.05) 0%, transparent 45%,
+    rgba(200,140,60,0.03) 100%);
+}
+
+/* Inner glass area — clips all weather to the frame opening */
+.glass-area {
+  position:absolute;
+  inset: 5% 5% 14% 5%;
+  overflow: hidden;
+  border-radius: 2px;
+  z-index: 2;
+  background: #0c1420;
+}
+
+/* Window frame — sits on top, purely decorative border */
+.window-frame {
+  position:absolute;
+  inset: 5% 5% 14% 5%;
+  border: 10px solid var(--wood-light);
+  border-radius: 3px; z-index: 7; pointer-events:none;
+  box-shadow:
+    inset 0 0 30px rgba(0,0,0,0.6),
+    0 0 0 3px var(--wood),
+    0 6px 30px rgba(0,0,0,0.7);
+}
+/* Cross bars */
+.window-frame::before, .window-frame::after {
+  content:''; position:absolute; background:var(--wood-light);
+}
+.window-frame::before { /* horizontal */
+  left:-10px; right:-10px; top:calc(50% - 5px); height:10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.window-frame::after { /* vertical */
+  top:-10px; bottom:-10px; left:calc(50% - 5px); width:10px;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.4);
+}
+
+/* Windowsill */
+.sill {
+  position:absolute; bottom:6%; left:4%; right:4%; height:26px;
+  background: linear-gradient(to bottom, var(--wood-light), var(--wood));
+  border-radius:2px; z-index:8;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+}
+
+/* Candle */
+.candle-wrap {
+  position:absolute; bottom:calc(6% + 26px); left:12%; z-index:9;
+  display:flex; flex-direction:column; align-items:center;
+}
+.candle-glow-pool {
+  position:absolute; bottom:-4px; left:50%;
+  transform:translateX(-50%);
+  width:60px; height:14px; border-radius:50%;
+  background: radial-gradient(ellipse, rgba(220,150,50,0.35) 0%, transparent 70%);
+  animation: glowFlicker 3s ease-in-out infinite;
+}
+.candle-body {
+  width:11px; height:28px;
+  background: linear-gradient(to right, #dcc898, #f0e0b8, #d8be88);
+  border-radius:2px 2px 1px 1px; position:relative;
+}
+/* Flickering light cast on sill from candle */
+.candle-sill-light {
+  position:absolute; bottom:calc(6% + 20px); left:8%; z-index:8;
+  width:120px; height:30px; border-radius:50%;
+  background: radial-gradient(ellipse, rgba(220,150,50,0.22) 0%, transparent 70%);
+  animation: glowFlicker 3s ease-in-out infinite;
+  pointer-events:none;
+}
+.flame-wrap {
+  position:absolute; top:-18px; left:50%; transform:translateX(-50%);
+  width:20px; height:20px;
+}
+.flame {
+  position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+  width:9px; height:15px;
+  background: radial-gradient(ellipse at 50% 85%,
+    #fff 0%, #ffe060 25%, #ff9020 65%, transparent 100%);
+  border-radius:50% 50% 30% 30%;
+  filter:blur(0.5px);
+  animation: flameDance 1.4s ease-in-out infinite;
+  transform-origin:bottom center;
+}
+.flame-inner {
+  position:absolute; bottom:1px; left:50%; transform:translateX(-50%);
+  width:5px; height:8px;
+  background: radial-gradient(ellipse at 50% 85%, #fff 0%, #fff8c0 60%, transparent 100%);
+  border-radius:50% 50% 30% 30%;
+  filter:blur(0.3px);
+  animation: flameDance 1.1s ease-in-out infinite reverse;
+}
+.flame-glow {
+  position:absolute; bottom:-2px; left:50%; transform:translateX(-50%);
+  width:36px; height:36px; border-radius:50%;
+  background: radial-gradient(circle, rgba(255,190,50,0.45) 0%, transparent 70%);
+  animation: glowFlicker 3s ease-in-out infinite;
+}
+@keyframes flameDance {
+  0%,100%{ transform:translateX(-50%) scaleX(1) rotate(-2deg); }
+  25%    { transform:translateX(-53%) scaleX(0.88) rotate(3deg); }
+  50%    { transform:translateX(-50%) scaleX(1.08) rotate(-1deg); }
+  75%    { transform:translateX(-47%) scaleX(0.92) rotate(2deg); }
+}
+
+/* Plant */
+.plant-wrap {
+  position:absolute; bottom:calc(6% + 22px); right:10%; z-index:9;
+  font-size:2.2rem;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));
+  transform-origin: bottom center;
+  animation: plantSway 5s ease-in-out infinite;
+}
+/* Individual leaf children get staggered sway */
+.leaf {
+  display:inline-block;
+  transform-origin:bottom center;
+  animation: leafWave 3s ease-in-out infinite;
+}
+.leaf:nth-child(2) { animation-delay:0.4s; }
+.leaf:nth-child(3) { animation-delay:0.8s; }
+@keyframes plantSway {
+  0%,100%{ transform:rotate(-3deg); }
+  50%    { transform:rotate(3deg); }
+}
+@keyframes leafWave {
+  0%,100%{ transform:rotate(-4deg) scaleY(1); }
+  50%    { transform:rotate(4deg) scaleY(1.04); }
+}
+
+/* Dust motes */
+.mote {
+  position:absolute; border-radius:50%; pointer-events:none; z-index:6;
+  background: rgba(220,180,120,0.55);
+  animation: moteFloat linear infinite;
+}
+@keyframes moteFloat {
+  0%   { transform:translate(0,0) scale(1); opacity:0; }
+  15%  { opacity:1; }
+  85%  { opacity:0.6; }
+  100% { transform:translate(var(--mx), var(--my)) scale(0.6); opacity:0; }
+}
+
+/* ── RIGHT PANEL ─────────────────────────────────────────────────────────── */
+.right-panel {
+  background: linear-gradient(180deg, #201810 0%, #1a1208 100%);
+  border-left: 3px solid var(--wood);
+  display:flex; flex-direction:column;
+  overflow-y:auto; overflow-x:hidden;
+  position:relative; z-index:10;
+  box-shadow: -8px 0 40px rgba(0,0,0,0.6);
+  height:100vh;
+}
+.right-panel::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background: repeating-linear-gradient(
+    transparent, transparent 27px,
+    rgba(200,180,140,0.03) 27px, rgba(200,180,140,0.03) 28px);
+}
+
+/* Header */
+.cafe-header {
+  padding:28px 24px 20px;
+  border-bottom:1px solid rgba(196,173,144,0.12);
+  flex-shrink:0;
+}
+.cafe-name {
+  font-family:'Dancing Script',cursive; font-size:1.9rem;
+  color:var(--amber-pale); line-height:1; margin-bottom:4px;
+  text-shadow:0 2px 14px rgba(200,140,80,0.35);
+}
+.cafe-tagline {
+  font-style:italic; font-size:0.76rem;
+  color:var(--warm-mid); letter-spacing:0.04em;
+}
+
+/* Table note */
+.table-note {
+  margin:16px 16px 0;
+  background:rgba(240,225,195,0.06);
+  border:1px solid rgba(196,173,144,0.18); border-radius:3px;
+  padding:14px 16px; position:relative; flex-shrink:0;
+}
+.table-note::before {
+  content:'📝'; position:absolute; top:-10px; left:12px; font-size:0.88rem;
+}
+.note-text {
+  font-family:'Dancing Script',cursive; font-size:0.9rem;
+  line-height:1.7; color:var(--amber-pale);
+}
+.note-sign {
+  font-family:'Dancing Script',cursive; font-size:0.78rem;
+  color:var(--warm-mid); text-align:right; margin-top:5px;
+}
+
+/* Section labels */
+.sec-label {
+  font-size:0.58rem; letter-spacing:0.2em; text-transform:uppercase;
+  color:var(--warm-mid); padding:18px 22px 8px; opacity:0.75; flex-shrink:0;
+}
+
+/* Menu */
+.menu-list {
+  padding:0 14px; display:flex; flex-direction:column; gap:5px; flex-shrink:0;
+}
+.menu-item {
+  background:var(--card-bg); border:1px solid var(--card-border);
+  border-radius:4px; padding:11px 13px; cursor:pointer;
+  transition:background 0.2s, border-color 0.2s, transform 0.15s;
+  display:flex; align-items:flex-start; gap:9px; position:relative;
+}
+.menu-item:hover {
+  background:rgba(240,230,210,0.09);
+  border-color:rgba(200,140,80,0.32); transform:translateX(2px);
+}
+.menu-emoji { font-size:1.05rem; flex-shrink:0; margin-top:1px; }
+.menu-info  { flex:1; }
+.menu-name  { font-size:0.86rem; color:var(--amber-pale); margin-bottom:2px; }
+.menu-desc  {
+  font-style:italic; font-size:0.7rem;
+  color:var(--warm-mid); line-height:1.45;
+}
+.order-lbl {
+  font-size:0.62rem; color:var(--amber); opacity:0;
+  transition:opacity 0.2s; align-self:center; flex-shrink:0;
+  letter-spacing:0.05em;
+}
+.menu-item:hover .order-lbl { opacity:1; }
+
+/* Steam on menu hover */
+.menu-steam {
+  position:absolute; top:-18px; left:22px;
+  display:flex; gap:5px; pointer-events:none; opacity:0;
+  transition:opacity 0.3s;
+}
+.menu-item:hover .menu-steam { opacity:1; }
+.steam-puff {
+  width:3px; height:22px; border-radius:3px;
+  background:linear-gradient(to top, rgba(240,225,200,0.6), transparent);
+  filter:blur(1.5px);
+  animation:steamUp 1.6s ease-in-out infinite;
+}
+.steam-puff:nth-child(2){ animation-delay:0.35s; height:18px; }
+.steam-puff:nth-child(3){ animation-delay:0.7s;  height:14px; }
+@keyframes steamUp {
+  0%  { transform:translateY(0) scaleX(1); opacity:0; }
+  20% { opacity:1; }
+  80% { opacity:0.4; }
+  100%{ transform:translateY(-18px) scaleX(2); opacity:0; }
+}
+
+/* Sounds */
+.sounds-grid {
+  padding:0 14px 20px;
+  display:grid; grid-template-columns:1fr 1fr; gap:7px; flex-shrink:0;
+}
+.sound-btn {
+  background:var(--card-bg); border:1px solid var(--card-border);
+  border-radius:4px; padding:9px 10px 8px; cursor:pointer;
+  transition:all 0.2s; text-align:left;
+  display:flex; flex-direction:column; gap:5px;
+}
+.sound-btn:hover { background:rgba(240,230,210,0.09); border-color:rgba(200,140,80,0.28); }
+.sound-btn.active { background:rgba(200,140,80,0.1); border-color:rgba(200,140,80,0.45); }
+.sound-top { display:flex; align-items:center; justify-content:space-between; }
+.sound-label { font-size:0.7rem; color:var(--warm); display:flex; align-items:center; gap:4px; }
+.sound-icon  { font-size:0.82rem; }
+.sound-dot   {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--warm-mid); opacity:0.3; transition:all 0.3s;
+}
+.sound-btn.active .sound-dot {
+  background:var(--amber); opacity:1;
+  box-shadow:0 0 6px rgba(200,140,80,0.6);
+  animation:dotPulse 1.5s ease-in-out infinite;
+}
+@keyframes dotPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.35);} }
+.vol-slider {
+  -webkit-appearance:none; width:100%; height:2px;
+  background:rgba(196,173,144,0.2); border-radius:2px; outline:none;
+}
+.vol-slider::-webkit-slider-thumb {
+  -webkit-appearance:none; width:10px; height:10px;
+  border-radius:50%; background:var(--amber); cursor:pointer;
+  transition:transform 0.2s;
+}
+.vol-slider::-webkit-slider-thumb:hover { transform:scale(1.3); }
+
+/* Scrollbar */
+.right-panel::-webkit-scrollbar { width:3px; }
+.right-panel::-webkit-scrollbar-track { background:transparent; }
+.right-panel::-webkit-scrollbar-thumb { background:rgba(196,173,144,0.18); border-radius:2px; }
+
+/* ── ORDER SLIP MODAL ──────────────────────────────────────────────────────── */
+.order-overlay {
+  position:fixed; inset:0; z-index:100;
+  background:rgba(12,8,5,0.75); backdrop-filter:blur(8px);
+  display:flex; align-items:center; justify-content:center; padding:20px;
+  opacity:0; pointer-events:none; transition:opacity 0.35s ease;
+}
+.order-overlay.show { opacity:1; pointer-events:all; }
+
+.order-slip {
+  max-width:310px; width:100%;
+  background:#fdf6e8; border-radius:3px 3px 8px 8px; overflow:hidden; color:#3a2e22;
+  transform:translateY(30px) rotate(-1deg);
+  transition:transform 0.45s cubic-bezier(0.34,1.5,0.64,1);
+  box-shadow:0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,170,120,0.3);
+}
+.order-overlay.show .order-slip { transform:translateY(0) rotate(0deg); }
+
+.slip-head {
+  background:#2e2018; color:#fdf6e8;
+  padding:14px 18px 12px; text-align:center;
+}
+.slip-cafe {
+  font-family:'Dancing Script',cursive; font-size:1.35rem;
+  color:var(--amber-pale); display:block; margin-bottom:2px;
+}
+.slip-sub {
+  font-style:italic; font-size:0.65rem; color:rgba(245,230,200,0.55); letter-spacing:0.05em;
+}
+.slip-body {
+  padding:18px 20px; border-bottom:2px dashed rgba(180,155,110,0.3);
+}
+.slip-for {
+  font-size:0.62rem; letter-spacing:0.15em; color:#8a7060;
+  text-transform:uppercase; margin-bottom:3px;
+}
+.slip-name {
+  font-family:'Dancing Script',cursive; font-size:1.5rem; color:#3a2e22;
+  margin-bottom:14px; line-height:1;
+}
+.slip-drink-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.slip-drink-emoji { font-size:1.2rem; }
+.slip-drink-name { font-size:0.98rem; color:#3a2e22; font-weight:500; }
+
+/* Slip steam */
+.slip-steam {
+  display:flex; justify-content:center; gap:8px;
+  margin:14px 0 8px; height:48px; align-items:flex-end;
+}
+.slip-steam-line {
+  width:3px; border-radius:3px;
+  background:linear-gradient(to top, rgba(160,140,110,0.6), transparent);
+  filter:blur(1.5px);
+  animation:slipSteam 2.2s ease-in-out infinite;
+}
+.slip-steam-line:nth-child(1){ height:38px; animation-delay:0s; }
+.slip-steam-line:nth-child(2){ height:46px; animation-delay:0.5s; }
+.slip-steam-line:nth-child(3){ height:32px; animation-delay:1s; }
+@keyframes slipSteam {
+  0%  { transform:translateY(0) scaleX(1); opacity:0; }
+  20% { opacity:1; }
+  80% { opacity:0.5; }
+  100%{ transform:translateY(-40px) scaleX(2.2); opacity:0; }
+}
+
+.slip-msg {
+  font-family:'Dancing Script',cursive; font-size:0.86rem;
+  line-height:1.65; color:#6a5040; font-style:italic; margin-top:4px;
+}
+.slip-footer {
+  padding:12px 20px 18px; display:flex; align-items:center; justify-content:space-between;
+}
+.slip-from { font-family:'Dancing Script',cursive; font-size:0.78rem; color:#8a7060; }
+.slip-sign { font-family:'Dancing Script',cursive; font-size:1.15rem; color:#3a2e22; border-bottom:1px solid rgba(100,80,60,0.3); padding-bottom:2px; }
+.slip-close {
+  display:block; width:100%; background:#2e2018; color:var(--amber-pale);
+  border:none; font-family:'Lora',serif; font-size:0.7rem; letter-spacing:0.15em;
+  text-transform:uppercase; padding:12px; cursor:pointer; transition:background 0.2s;
+}
+.slip-close:hover { background:#3e3028; }
+
+/* ── AMBIENT LABEL ─────────────────────────────────────────────────────────── */
+.ambient-status {
+  position:fixed; bottom:18px; left:18px; z-index:5; pointer-events:none;
+  font-family:'Dancing Script',cursive; font-size:0.8rem;
+  color:rgba(196,173,144,0.4); transition:opacity 0.5s;
+}
+
+/* ── MOBILE ────────────────────────────────────────────────────────────────── */
+@media(max-width:680px){
+  .scene { grid-template-columns:1fr; grid-template-rows:42vh 1fr; }
+  .window-panel { grid-row:1; height:42vh; }
+  .right-panel  { grid-row:2; border-left:none; border-top:3px solid var(--wood); height:auto; overflow-y:auto; }
+  html,body { overflow:auto; height:auto; }
+  .scene { height:auto; }
+}
 </style>
-
 </head>
 <body>
 
 <div class="scene">
 
-  <!-- ── WINDOW SCENE ───────────────────────────────────────────────────── -->
-
-  <div class="window-panel">
-    <div class="window-frame">
-      <div class="window-sky"></div>
-      <div class="fog"></div>
-      <div class="fog2"></div>
-      <div class="city">
-        <div class="city-lights" id="cityLights"></div>
-      </div>
+  <!-- LEFT: window scene -->
+  <div class="window-panel" id="windowPanel">
+    <!-- Glass area clips all weather elements to the frame opening -->
+    <div class="glass-area">
+      <div class="sky"></div>
+      <div class="cloud-layer"></div>
+      <div class="city"><div class="city-lights" id="cityLights"></div></div>
       <canvas id="rainCanvas"></canvas>
       <div class="condensation" id="condensation"></div>
-      <div class="window-reflection"></div>
-      <div class="window-cross-h"></div>
-      <div class="window-cross-v"></div>
+      <div class="glass-reflect"></div>
     </div>
-    <div class="windowsill"></div>
-    <div class="plant">🌿</div>
+    <div class="room-glow"></div>
+    <div class="window-frame"></div>
+    <div class="sill"></div>
+    <div class="candle-sill-light"></div>
+    <!-- Candle -->
     <div class="candle-wrap">
-      <div class="candle-glow"></div>
+      <div class="candle-glow-pool"></div>
       <div class="candle-body">
-        <div class="candle-flame"></div>
+        <div class="flame-wrap">
+          <div class="flame-glow"></div>
+          <div class="flame"></div>
+          <div class="flame-inner"></div>
+        </div>
       </div>
     </div>
+    <!-- Plant -->
+    <div class="plant-wrap" id="plant">🌿</div>
+    <!-- Dust motes container -->
+    <div id="motes"></div>
   </div>
 
-  <!-- ── RIGHT PANEL ────────────────────────────────────────────────────── -->
-
+  <!-- RIGHT: menu panel -->
   <div class="right-panel">
 
-```
-<div class="cafe-header">
-  <div class="cafe-name">The Blue Willow</div>
-  <div class="cafe-tagline">a quiet corner, just for you · est. nov 2025</div>
-</div>
+    <div class="cafe-header">
+      <div class="cafe-name">The Blue Willow</div>
+      <div class="cafe-tagline">a quiet corner, just for you · est. nov 2025</div>
+    </div>
 
-<!-- Table note -->
-<div class="table-note">
-  <p class="note-text">I saved you a seat. No agenda, no rush — just you, the rain, and a little while to simply be. Order something warm. I'll find you here.</p>
-  <p class="note-sign">— Aishu ♡</p>
-</div>
+    <div class="table-note">
+      <p class="note-text">I saved you a seat. No agenda, no rush — just you, the rain, and a little while to simply be. Order something warm. I'll find you here.</p>
+      <p class="note-sign">— Aishu ♡</p>
+    </div>
 
-<!-- Menu -->
-<div class="section-label">· today's menu ·</div>
-<div class="menu-list" id="menuList"></div>
+    <div class="sec-label">· today's menu ·</div>
+    <div class="menu-list" id="menuList"></div>
 
-<!-- Sounds -->
-<div class="section-label">· set the mood ·</div>
-<div class="sounds-grid" id="soundsGrid"></div>
-```
+    <div class="sec-label">· set the mood ·</div>
+    <div class="sounds-grid" id="soundsGrid"></div>
 
   </div>
 </div>
-
-<!-- Ambient label -->
 
 <div class="ambient-status" id="ambientStatus">the rain falls quietly outside ☔</div>
 
-<!-- Order slip modal -->
-
+<!-- Order slip -->
 <div class="order-overlay" id="orderOverlay" onclick="overlayClick(event)">
-  <div class="order-slip" id="orderSlip">
-    <div class="slip-header">
+  <div class="order-slip">
+    <div class="slip-head">
       <span class="slip-cafe">The Blue Willow</span>
       <span class="slip-sub">order confirmed · made with love</span>
     </div>
@@ -801,12 +611,12 @@
         <span class="slip-drink-emoji" id="slipEmoji"></span>
         <span class="slip-drink-name" id="slipDrink"></span>
       </div>
-      <div class="slip-steam-wrap">
-        <div class="steam-line" style="height:40px"></div>
-        <div class="steam-line"></div>
-        <div class="steam-line" style="height:30px"></div>
+      <div class="slip-steam">
+        <div class="slip-steam-line"></div>
+        <div class="slip-steam-line"></div>
+        <div class="slip-steam-line"></div>
       </div>
-      <p class="slip-message" id="slipMessage"></p>
+      <p class="slip-msg" id="slipMsg"></p>
     </div>
     <div class="slip-footer">
       <span class="slip-from">with love from</span>
@@ -817,449 +627,350 @@
 </div>
 
 <script>
-// ── MENU DATA ──────────────────────────────────────────────────────────────
+// ── MENU ───────────────────────────────────────────────────────────────────
 const menu = [
-  {
-    emoji: "🍵", name: "Hojicha Latte",
-    desc: "roasted, nutty, a little smoky — like a warm conversation that goes nowhere in particular and everywhere at once",
-    msg: "i picked this one for you because it's warm without being overwhelming. just like you need to be right now. sip slowly, bubs."
-  },
-  {
-    emoji: "✨", name: "Masala Chai",
-    desc: "spiced cardamom, ginger, cinnamon — the kind of thing your grandmother would make you when the world felt too big",
-    msg: "this one has some fire in it. figured you could use a little warmth in your chest today. you're doing great, even when it doesn't feel like it."
-  },
-  {
-    emoji: "☁️", name: "White Hot Chocolate",
-    desc: "soft, creamy, impossibly gentle — no bitterness anywhere, just sweetness from start to finish",
-    msg: "the sweetest thing on the menu, obviously for the sweetest person. no notes. just drink it and be cozy, okaii?"
-  },
-  {
-    emoji: "🌼", name: "Chamomile Honey Latte",
-    desc: "floral, golden, sleepy-soft — the kind of drink that convinces your shoulders to finally relax",
-    msg: "i see those shoulders. put them down. this one's made to make you breathe slower. let it do its job."
-  },
-  {
-    emoji: "🍃", name: "Matcha Latte",
-    desc: "earthy and grounding, slightly sweet — for when you need something that roots you back to the present",
-    msg: "grounding. earthy. present. like the kind of hug that doesn't let go until you feel better. that's what this is."
-  },
-  {
-    emoji: "🌫️", name: "London Fog",
-    desc: "earl grey, vanilla, steamed oat milk — sophisticated but deeply comforting, like a really good book",
-    msg: "a little bit fancy, a little bit cozy. just like you, if i'm being honest. also it smells like lavender and i think you'd like that."
-  },
-  {
-    emoji: "🌹", name: "Rose Lemonade",
-    desc: "floral, cool, slightly tart — for when you want something that feels like a sigh of relief",
-    msg: "something light and pretty for a light and pretty moment. take a breath. the rain's doing all the hard work outside."
-  },
-  {
-    emoji: "💜", name: "Lavender Oat Milk",
-    desc: "dreamy and soft, almost purple — the colour of calm, served cold in a tall glass",
-    msg: "this one is basically a calm in a glass. i made it especially for when the world's being a little too loud. here."
-  },
-  {
-    emoji: "💙", name: "Blue Pea Flower Lemonade",
-    desc: "colour-shifting, magical — starts deep blue, blushes purple with the lemon. a little bit of wonder in a glass",
-    msg: "okay but did you see it change colour?? i wanted you to have at least one magical thing today. you're welcome, my love."
-  },
-  {
-    emoji: "🍓", name: "Strawberry Matcha",
-    desc: "sweet meets earthy — the kind of combination that surprises you and then makes perfect sense",
-    msg: "this one's a little unexpected but absolutely works. a bit like us, if you think about it :P drink it."
-  },
+  { emoji:"🍵", name:"Hojicha Latte",
+    desc:"roasted, nutty, a little smoky — like a warm conversation that goes nowhere in particular and everywhere at once",
+    msg:"i picked this one for you because it's warm without being overwhelming. just like you need to be right now. sip slowly, bubs." },
+  { emoji:"✨", name:"Masala Chai",
+    desc:"spiced cardamom, ginger, cinnamon — the kind of thing your grandmother would make you when the world felt too big",
+    msg:"this one has some fire in it. figured you could use a little warmth in your chest today. you're doing great, even when it doesn't feel like it." },
+  { emoji:"☁️", name:"White Hot Chocolate",
+    desc:"soft, creamy, impossibly gentle — no bitterness anywhere, just sweetness from start to finish",
+    msg:"the sweetest thing on the menu, obviously for the sweetest person. no notes. just drink it and be cozy, okaii?" },
+  { emoji:"🌼", name:"Chamomile Honey Latte",
+    desc:"floral, golden, sleepy-soft — the kind of drink that convinces your shoulders to finally relax",
+    msg:"i see those shoulders. put them down. this one's made to make you breathe slower. let it do its job." },
+  { emoji:"🍃", name:"Matcha Latte",
+    desc:"earthy and grounding, slightly sweet — for when you need something that roots you back to the present",
+    msg:"grounding. earthy. present. like the kind of hug that doesn't let go until you feel better. that's what this is." },
+  { emoji:"🌫️", name:"London Fog",
+    desc:"earl grey, vanilla, steamed oat milk — sophisticated but deeply comforting, like a really good book",
+    msg:"a little bit fancy, a little bit cozy. just like you, if i'm being honest. also it smells like lavender and i think you'd like that." },
+  { emoji:"🌹", name:"Rose Lemonade",
+    desc:"floral, cool, slightly tart — for when you want something that feels like a sigh of relief",
+    msg:"something light and pretty for a light and pretty moment. take a breath. the rain's doing all the hard work outside." },
+  { emoji:"💜", name:"Lavender Oat Milk",
+    desc:"dreamy and soft, almost purple — the colour of calm, served cold in a tall glass",
+    msg:"this one is basically calm in a glass. i made it especially for when the world's being a little too loud. here." },
+  { emoji:"💙", name:"Blue Pea Flower Lemonade",
+    desc:"colour-shifting, magical — starts deep blue, blushes purple with the lemon. a little bit of wonder in a glass",
+    msg:"okay but did you see it change colour?? i wanted you to have at least one magical thing today. you're welcome, my love." },
+  { emoji:"🍓", name:"Strawberry Matcha",
+    desc:"sweet meets earthy — the kind of combination that surprises you and then makes perfect sense",
+    msg:"this one's a little unexpected but absolutely works. a bit like us, if you think about it :P drink it." },
 ];
 
-// ── SOUNDS DATA ────────────────────────────────────────────────────────────
-const sounds = [
-  { id:"rain",    emoji:"🌧️", label:"Rain",         freq:200,  type:"rain"    },
-  { id:"coffee",  emoji:"☕",  label:"Coffee",       freq:600,  type:"brew"    },
-  { id:"fire",    emoji:"🔥",  label:"Fireplace",    freq:80,   type:"fire"    },
-  { id:"pages",   emoji:"📖",  label:"Pages",        freq:1200, type:"pages"   },
-  { id:"chatter", emoji:"💬",  label:"Chatter",      freq:400,  type:"chatter" },
-  { id:"jazz",    emoji:"🎵",  label:"Jazz",         freq:300,  type:"jazz"    },
-  { id:"wind",    emoji:"🌬️",  label:"Wind",         freq:150,  type:"wind"    },
-  { id:"keys",    emoji:"⌨️",  label:"Typing",       freq:900,  type:"keys"    },
-];
-
-// ── BUILD MENU ─────────────────────────────────────────────────────────────
 const menuList = document.getElementById('menuList');
 menu.forEach(item => {
   const el = document.createElement('div');
   el.className = 'menu-item';
   el.innerHTML = `
+    <div class="menu-steam">
+      <div class="steam-puff"></div>
+      <div class="steam-puff"></div>
+      <div class="steam-puff"></div>
+    </div>
     <span class="menu-emoji">${item.emoji}</span>
     <div class="menu-info">
       <div class="menu-name">${item.name}</div>
       <div class="menu-desc">${item.desc}</div>
     </div>
-    <span class="order-btn">order ›</span>
+    <span class="order-lbl">order ›</span>
   `;
   el.addEventListener('click', () => placeOrder(item));
   menuList.appendChild(el);
 });
 
-// ── BUILD SOUNDS ───────────────────────────────────────────────────────────
+// ── SOUNDS ─────────────────────────────────────────────────────────────────
+const sounds = [
+  { id:"rain",    emoji:"🌧️", label:"Rain",      type:"rain"    },
+  { id:"coffee",  emoji:"☕",  label:"Coffee",    type:"brew"    },
+  { id:"fire",    emoji:"🔥",  label:"Fireplace", type:"fire"    },
+  { id:"pages",   emoji:"📖",  label:"Pages",     type:"pages"   },
+  { id:"chatter", emoji:"💬",  label:"Chatter",   type:"chatter" },
+  { id:"jazz",    emoji:"🎵",  label:"Jazz",      type:"jazz"    },
+  { id:"wind",    emoji:"🌬️",  label:"Wind",      type:"wind"    },
+  { id:"keys",    emoji:"⌨️",  label:"Typing",    type:"keys"    },
+];
+
 let audioCtx = null;
 const activeSounds = {};
 
-function getAudioCtx() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
 
-function makeNoise(seconds, amplitude) {
-  const ctx = getAudioCtx();
-  const buf = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * amplitude;
+function makeNoise(secs, amp) {
+  const c = getCtx();
+  const buf = c.createBuffer(1, c.sampleRate * secs, c.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*amp;
   return buf;
 }
 
-function generateSound(type, gainNode) {
-  const ctx = getAudioCtx();
-  const stopFns = [];
+function generateSound(type, gain) {
+  const c = getCtx(); const stops = [];
 
-  if (type === 'rain') {
-    // Layered bandpass noise — gentle patter
-    [800, 1600, 3200].forEach((freq, i) => {
-      const src = ctx.createBufferSource();
-      src.buffer = makeNoise(3, 0.8); src.loop = true;
-      const filt = ctx.createBiquadFilter();
-      filt.type = 'bandpass'; filt.frequency.value = freq; filt.Q.value = 0.5;
-      const g = ctx.createGain(); g.gain.value = 0.18 - i * 0.04;
-      src.connect(filt); filt.connect(g); g.connect(gainNode);
-      src.start();
-      stopFns.push(() => { try { src.stop(); } catch(e){} });
+  if (type==='rain') {
+    [800,1600,3200].forEach((f,i)=>{
+      const s=c.createBufferSource(); s.buffer=makeNoise(3,0.8); s.loop=true;
+      const fl=c.createBiquadFilter(); fl.type='bandpass'; fl.frequency.value=f; fl.Q.value=0.5;
+      const g=c.createGain(); g.gain.value=0.18-i*0.04;
+      s.connect(fl); fl.connect(g); g.connect(gain); s.start();
+      stops.push(()=>{try{s.stop();}catch(e){}});
     });
   }
-
-  else if (type === 'fire') {
-    // Low rumble + crackle
-    const src = ctx.createBufferSource();
-    src.buffer = makeNoise(4, 1); src.loop = true;
-    const low = ctx.createBiquadFilter();
-    low.type = 'lowpass'; low.frequency.value = 180;
-    const g = ctx.createGain(); g.gain.value = 0.35;
-    // Slow amplitude LFO for flickering
-    const lfo = ctx.createOscillator();
-    const lfoG = ctx.createGain();
-    lfo.frequency.value = 0.8; lfoG.gain.value = 0.12;
-    lfo.connect(lfoG); lfoG.connect(g.gain);
-    src.connect(low); low.connect(g); g.connect(gainNode);
-    lfo.start(); src.start();
-    // Occasional crackle
-    const crackle = setInterval(() => {
-      const csrc = ctx.createBufferSource();
-      csrc.buffer = makeNoise(0.08, 1);
-      const cfilt = ctx.createBiquadFilter();
-      cfilt.type = 'highpass'; cfilt.frequency.value = 1000;
-      const cg = ctx.createGain(); cg.gain.value = 0.06;
-      csrc.connect(cfilt); cfilt.connect(cg); cg.connect(gainNode);
-      csrc.start();
-    }, 800 + Math.random() * 1200);
-    stopFns.push(() => { try { src.stop(); lfo.stop(); } catch(e){} clearInterval(crackle); });
+  else if (type==='fire') {
+    const s=c.createBufferSource(); s.buffer=makeNoise(4,1); s.loop=true;
+    const fl=c.createBiquadFilter(); fl.type='lowpass'; fl.frequency.value=180;
+    const g=c.createGain(); g.gain.value=0.35;
+    const lfo=c.createOscillator(),lg=c.createGain();
+    lfo.frequency.value=0.8; lg.gain.value=0.12;
+    lfo.connect(lg); lg.connect(g.gain);
+    s.connect(fl); fl.connect(g); g.connect(gain); lfo.start(); s.start();
+    const cr=setInterval(()=>{
+      const cs=c.createBufferSource(); cs.buffer=makeNoise(0.08,1);
+      const cf=c.createBiquadFilter(); cf.type='highpass'; cf.frequency.value=1000;
+      const cg=c.createGain(); cg.gain.value=0.06;
+      cs.connect(cf); cf.connect(cg); cg.connect(gain); cs.start();
+    }, 800+Math.random()*1200);
+    stops.push(()=>{try{s.stop();lfo.stop();}catch(e){} clearInterval(cr);});
   }
-
-  else if (type === 'wind') {
-    const src = ctx.createBufferSource();
-    src.buffer = makeNoise(5, 1); src.loop = true;
-    const filt = ctx.createBiquadFilter();
-    filt.type = 'bandpass'; filt.frequency.value = 350; filt.Q.value = 1.2;
-    const g = ctx.createGain(); g.gain.value = 0.22;
-    const lfo = ctx.createOscillator();
-    const lfoG = ctx.createGain();
-    lfo.frequency.value = 0.12; lfoG.gain.value = 200;
-    lfo.connect(lfoG); lfoG.connect(filt.frequency);
-    // Gain LFO for gusts
-    const lfo2 = ctx.createOscillator();
-    const lfo2G = ctx.createGain();
-    lfo2.frequency.value = 0.07; lfo2G.gain.value = 0.1;
-    lfo2.connect(lfo2G); lfo2G.connect(g.gain);
-    src.connect(filt); filt.connect(g); g.connect(gainNode);
-    lfo.start(); lfo2.start(); src.start();
-    stopFns.push(() => { try { src.stop(); lfo.stop(); lfo2.stop(); } catch(e){} });
+  else if (type==='wind') {
+    const s=c.createBufferSource(); s.buffer=makeNoise(5,1); s.loop=true;
+    const fl=c.createBiquadFilter(); fl.type='bandpass'; fl.frequency.value=350; fl.Q.value=1.2;
+    const g=c.createGain(); g.gain.value=0.22;
+    const lfo=c.createOscillator(),lg=c.createGain();
+    lfo.frequency.value=0.12; lg.gain.value=200; lfo.connect(lg); lg.connect(fl.frequency);
+    const lfo2=c.createOscillator(),lg2=c.createGain();
+    lfo2.frequency.value=0.07; lg2.gain.value=0.1; lfo2.connect(lg2); lg2.connect(g.gain);
+    s.connect(fl); fl.connect(g); g.connect(gain); lfo.start(); lfo2.start(); s.start();
+    stops.push(()=>{try{s.stop();lfo.stop();lfo2.stop();}catch(e){}});
   }
-
-  else if (type === 'brew') {
-    // Bubbling / percolating
-    const src = ctx.createBufferSource();
-    src.buffer = makeNoise(2, 0.5); src.loop = true;
-    const filt = ctx.createBiquadFilter();
-    filt.type = 'bandpass'; filt.frequency.value = 600; filt.Q.value = 2;
-    const g = ctx.createGain(); g.gain.value = 0.15;
-    src.connect(filt); filt.connect(g); g.connect(gainNode);
-    src.start();
-    // Occasional bubble pop
-    const bubbles = setInterval(() => {
-      const osc = ctx.createOscillator();
-      const og = ctx.createGain();
-      osc.frequency.value = 300 + Math.random() * 400;
-      og.gain.setValueAtTime(0.06, ctx.currentTime);
-      og.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
-      osc.connect(og); og.connect(gainNode);
-      osc.start(); osc.stop(ctx.currentTime + 0.18);
-    }, 400 + Math.random() * 600);
-    stopFns.push(() => { try { src.stop(); } catch(e){} clearInterval(bubbles); });
+  else if (type==='brew') {
+    const s=c.createBufferSource(); s.buffer=makeNoise(2,0.5); s.loop=true;
+    const fl=c.createBiquadFilter(); fl.type='bandpass'; fl.frequency.value=600; fl.Q.value=2;
+    const g=c.createGain(); g.gain.value=0.15;
+    s.connect(fl); fl.connect(g); g.connect(gain); s.start();
+    const bub=setInterval(()=>{
+      const o=c.createOscillator(),og=c.createGain();
+      o.frequency.value=300+Math.random()*400;
+      og.gain.setValueAtTime(0.06,c.currentTime);
+      og.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.15);
+      o.connect(og); og.connect(gain); o.start(); o.stop(c.currentTime+0.18);
+    },400+Math.random()*600);
+    stops.push(()=>{try{s.stop();}catch(e){} clearInterval(bub);});
   }
-
-  else if (type === 'chatter') {
-    // Multiple detuned noise bands simulating murmur
-    [250, 380, 180, 420, 300].forEach((freq, i) => {
-      const src = ctx.createBufferSource();
-      src.buffer = makeNoise(3, 0.3); src.loop = true;
-      const filt = ctx.createBiquadFilter();
-      filt.type = 'bandpass'; filt.frequency.value = freq; filt.Q.value = 4;
-      const g = ctx.createGain(); g.gain.value = 0.06;
-      const lfo = ctx.createOscillator();
-      const lfoG = ctx.createGain();
-      lfo.frequency.value = 1.5 + i * 0.4 + Math.random(); lfoG.gain.value = 0.04;
-      lfo.connect(lfoG); lfoG.connect(g.gain);
-      src.connect(filt); filt.connect(g); g.connect(gainNode);
-      lfo.start(); src.start();
-      stopFns.push(() => { try { src.stop(); lfo.stop(); } catch(e){} });
+  else if (type==='chatter') {
+    [250,380,180,420,300].forEach((f,i)=>{
+      const s=c.createBufferSource(); s.buffer=makeNoise(3,0.3); s.loop=true;
+      const fl=c.createBiquadFilter(); fl.type='bandpass'; fl.frequency.value=f; fl.Q.value=4;
+      const g=c.createGain(); g.gain.value=0.06;
+      const lfo=c.createOscillator(),lg=c.createGain();
+      lfo.frequency.value=1.5+i*0.4; lg.gain.value=0.04;
+      lfo.connect(lg); lg.connect(g.gain);
+      s.connect(fl); fl.connect(g); g.connect(gain); lfo.start(); s.start();
+      stops.push(()=>{try{s.stop();lfo.stop();}catch(e){}});
     });
   }
-
-  else if (type === 'jazz') {
-    // Gentle plucked notes in a warm scale
-    const scale = [196, 220, 246.9, 261.6, 293.7, 329.6, 369.9, 392, 440, 493.9];
-    let running = true;
-    const playNote = () => {
-      if (!running) return;
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
-      osc.type = 'triangle';
-      const baseFreq = scale[Math.floor(Math.random() * scale.length)];
-      osc.frequency.value = baseFreq * (Math.random() > 0.3 ? 1 : 2);
-      const now = ctx.currentTime;
-      g.gain.setValueAtTime(0, now);
-      g.gain.linearRampToValueAtTime(0.055, now + 0.04);
-      g.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
-      osc.connect(g); g.connect(gainNode);
-      osc.start(now); osc.stop(now + 0.75);
-      const delay = 280 + Math.random() * 500;
-      setTimeout(playNote, delay);
+  else if (type==='jazz') {
+    const scale=[196,220,246.9,261.6,293.7,329.6,369.9,392,440,493.9];
+    let on=true;
+    const note=()=>{
+      if(!on)return;
+      const o=c.createOscillator(),g=c.createGain();
+      o.type='triangle';
+      o.frequency.value=scale[Math.floor(Math.random()*scale.length)]*(Math.random()>0.3?1:2);
+      const now=c.currentTime;
+      g.gain.setValueAtTime(0,now); g.gain.linearRampToValueAtTime(0.055,now+0.04);
+      g.gain.exponentialRampToValueAtTime(0.001,now+0.7);
+      o.connect(g); g.connect(gain); o.start(now); o.stop(now+0.75);
+      setTimeout(note,280+Math.random()*500);
     };
-    playNote();
-    stopFns.push(() => { running = false; });
+    note(); stops.push(()=>{on=false;});
   }
-
-  else if (type === 'pages') {
-    let running = true;
-    const playPage = () => {
-      if (!running) return;
-      // Short filtered noise burst
-      const buf = ctx.createBuffer(1, ctx.sampleRate * 0.12, ctx.sampleRate);
-      const data = buf.getChannelData(0);
-      for (let i = 0; i < data.length; i++) {
-        const t = i / ctx.sampleRate;
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-t * 30) * 0.8;
-      }
-      const src = ctx.createBufferSource(); src.buffer = buf;
-      const filt = ctx.createBiquadFilter();
-      filt.type = 'highpass'; filt.frequency.value = 3000;
-      const g = ctx.createGain(); g.gain.value = 0.25;
-      src.connect(filt); filt.connect(g); g.connect(gainNode);
-      src.start();
-      const next = 2500 + Math.random() * 4000;
-      setTimeout(playPage, next);
+  else if (type==='pages') {
+    let on=true;
+    const pg=()=>{
+      if(!on)return;
+      const buf=c.createBuffer(1,c.sampleRate*0.12,c.sampleRate);
+      const d=buf.getChannelData(0);
+      for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/c.sampleRate*30)*0.8;
+      const s=c.createBufferSource(); s.buffer=buf;
+      const fl=c.createBiquadFilter(); fl.type='highpass'; fl.frequency.value=3000;
+      const g=c.createGain(); g.gain.value=0.25;
+      s.connect(fl); fl.connect(g); g.connect(gain); s.start();
+      setTimeout(pg,2500+Math.random()*4000);
     };
-    playPage();
-    stopFns.push(() => { running = false; });
+    pg(); stops.push(()=>{on=false;});
   }
-
-  else if (type === 'keys') {
-    let running = true;
-    const playKey = () => {
-      const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.04), ctx.sampleRate);
-      const data = buf.getChannelData(0);
-      for (let i = 0; i < data.length; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.015)) * 0.7;
-      }
-      const src = ctx.createBufferSource(); src.buffer = buf;
-      const filt = ctx.createBiquadFilter();
-      filt.type = 'bandpass'; filt.frequency.value = 1800; filt.Q.value = 1;
-      const g = ctx.createGain(); g.gain.value = 0.3;
-      src.connect(filt); filt.connect(g); g.connect(gainNode);
-      src.start();
+  else if (type==='keys') {
+    let on=true;
+    const key=()=>{
+      const buf=c.createBuffer(1,Math.floor(c.sampleRate*0.04),c.sampleRate);
+      const d=buf.getChannelData(0);
+      for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/(c.sampleRate*0.015))*0.7;
+      const s=c.createBufferSource(); s.buffer=buf;
+      const fl=c.createBiquadFilter(); fl.type='bandpass'; fl.frequency.value=1800; fl.Q.value=1;
+      const g=c.createGain(); g.gain.value=0.3;
+      s.connect(fl); fl.connect(g); g.connect(gain); s.start();
     };
-    const scheduleTyping = () => {
-      if (!running) return;
-      const burst = Math.floor(Math.random() * 6) + 2;
-      for (let i = 0; i < burst; i++) {
-        setTimeout(playKey, i * (60 + Math.random() * 60));
-      }
-      setTimeout(scheduleTyping, 600 + Math.random() * 1400);
+    const sched=()=>{
+      if(!on)return;
+      const burst=Math.floor(Math.random()*6)+2;
+      for(let i=0;i<burst;i++) setTimeout(key,i*(60+Math.random()*60));
+      setTimeout(sched,600+Math.random()*1400);
     };
-    scheduleTyping();
-    stopFns.push(() => { running = false; });
+    sched(); stops.push(()=>{on=false;});
   }
-
-  return stopFns;
+  return stops;
 }
 
 const soundsGrid = document.getElementById('soundsGrid');
-sounds.forEach(s => {
-  const btn = document.createElement('div');
-  btn.className = 'sound-btn';
-  btn.id = 'snd-' + s.id;
-  btn.innerHTML = `
+sounds.forEach(s=>{
+  const btn=document.createElement('div');
+  btn.className='sound-btn'; btn.id='snd-'+s.id;
+  btn.innerHTML=`
     <div class="sound-top">
       <div class="sound-label"><span class="sound-icon">${s.emoji}</span>${s.label}</div>
-      <div class="sound-indicator"></div>
+      <div class="sound-dot"></div>
     </div>
     <input type="range" class="vol-slider" min="0" max="100" value="60"
-      oninput="setVolume('${s.id}', this.value)" onclick="event.stopPropagation()">
+      oninput="setVol('${s.id}',this.value)" onclick="event.stopPropagation()">
   `;
-  btn.addEventListener('click', () => toggleSound(s));
+  btn.addEventListener('click',()=>toggleSound(s));
   soundsGrid.appendChild(btn);
 });
 
-function toggleSound(s) {
-  const ctx = getAudioCtx();
-  const btn = document.getElementById('snd-' + s.id);
-
-  if (activeSounds[s.id]) {
-    // Stop all stop functions
-    activeSounds[s.id].stopFns.forEach(fn => { try { fn(); } catch(e){} });
-    activeSounds[s.id].gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
-    setTimeout(() => { try { activeSounds[s.id].gain.disconnect(); } catch(e){} }, 400);
-    delete activeSounds[s.id];
-    btn.classList.remove('active');
+function toggleSound(s){
+  const c=getCtx(); const btn=document.getElementById('snd-'+s.id);
+  if(activeSounds[s.id]){
+    activeSounds[s.id].stops.forEach(f=>{try{f();}catch(e){}});
+    activeSounds[s.id].gain.gain.linearRampToValueAtTime(0,c.currentTime+0.3);
+    setTimeout(()=>{try{activeSounds[s.id].gain.disconnect();}catch(e){}},400);
+    delete activeSounds[s.id]; btn.classList.remove('active');
   } else {
-    const gainNode = ctx.createGain();
-    const vol = btn.querySelector('.vol-slider').value / 100;
-    gainNode.gain.value = 0;
-    gainNode.gain.linearRampToValueAtTime(vol * 0.55, ctx.currentTime + 0.5);
-    gainNode.connect(ctx.destination);
-    const stopFns = generateSound(s.type, gainNode);
-    activeSounds[s.id] = { stopFns, gain: gainNode };
+    const g=c.createGain(); const vol=btn.querySelector('.vol-slider').value/100;
+    g.gain.value=0; g.gain.linearRampToValueAtTime(vol*0.55,c.currentTime+0.5);
+    g.connect(c.destination);
+    activeSounds[s.id]={stops:generateSound(s.type,g),gain:g};
     btn.classList.add('active');
   }
-
-  updateAmbientLabel();
+  updateAmbient();
 }
 
-function setVolume(id, val) {
-  if (activeSounds[id]) {
-    activeSounds[id].gain.gain.value = (val / 100) * 0.55;
-  }
+function setVol(id,val){
+  if(activeSounds[id]) activeSounds[id].gain.gain.value=(val/100)*0.55;
 }
 
-function updateAmbientLabel() {
-  const active = Object.keys(activeSounds);
-  const el = document.getElementById('ambientStatus');
-  if (active.length === 0) el.textContent = 'the rain falls quietly outside ☔';
-  else if (active.length === 1) el.textContent = `${sounds.find(s=>s.id===active[0]).emoji} playing softly`;
-  else el.textContent = `${active.length} sounds blending gently ✨`;
+function updateAmbient(){
+  const active=Object.keys(activeSounds);
+  const el=document.getElementById('ambientStatus');
+  if(!active.length) el.textContent='the rain falls quietly outside ☔';
+  else if(active.length===1) el.textContent=`${sounds.find(s=>s.id===active[0]).emoji} playing softly`;
+  else el.textContent=`${active.length} sounds blending gently ✨`;
 }
 
 // ── ORDER ──────────────────────────────────────────────────────────────────
-function placeOrder(item) {
-  document.getElementById('slipEmoji').textContent  = item.emoji;
-  document.getElementById('slipDrink').textContent  = item.name;
-  document.getElementById('slipMessage').textContent = item.msg;
+function placeOrder(item){
+  document.getElementById('slipEmoji').textContent=item.emoji;
+  document.getElementById('slipDrink').textContent=item.name;
+  document.getElementById('slipMsg').textContent=item.msg;
   document.getElementById('orderOverlay').classList.add('show');
 }
+function closeOrder(){ document.getElementById('orderOverlay').classList.remove('show'); }
+function overlayClick(e){ if(e.target===document.getElementById('orderOverlay')) closeOrder(); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeOrder(); });
 
-function closeOrder() {
-  document.getElementById('orderOverlay').classList.remove('show');
+// ── RAIN ───────────────────────────────────────────────────────────────────
+const rainCv=document.getElementById('rainCanvas');
+const rCtx=rainCv.getContext('2d');
+let drops=[], rainIntensity=1, rainTarget=1, rainTimer=0;
+
+function resizeRain(){
+  rainCv.width=rainCv.offsetWidth; rainCv.height=rainCv.offsetHeight;
 }
 
-function overlayClick(e) {
-  if (e.target === document.getElementById('orderOverlay')) closeOrder();
+function initDrops(){
+  drops=[];
+  for(let i=0;i<140;i++) drops.push(newDrop());
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOrder(); });
-
-// ── RAIN CANVAS ────────────────────────────────────────────────────────────
-const canvas = document.getElementById('rainCanvas');
-const ctx = canvas.getContext('2d');
-let drops = [];
-
-function resizeCanvas() {
-  canvas.width  = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
+function newDrop(){
+  return {
+    x:Math.random()*rainCv.width,
+    y:Math.random()*rainCv.height,
+    len:Math.random()*16+7,
+    speed:Math.random()*4+3,
+    opacity:Math.random()*0.35+0.1,
+    wind:Math.random()*1.4+0.5,
+  };
 }
 
-function initRain() {
-  drops = [];
-  for (let i = 0; i < 120; i++) {
-    drops.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      len: Math.random() * 18 + 8,
-      speed: Math.random() * 4 + 3,
-      opacity: Math.random() * 0.4 + 0.1,
-      wind: Math.random() * 1.5 + 0.5,
-    });
-  }
-}
+function animateRain(t){
+  // Slowly shift rain intensity
+  rainTimer+=0.005;
+  if(rainTimer>1){ rainTimer=0; rainTarget=0.4+Math.random()*0.9; }
+  rainIntensity+=(rainTarget-rainIntensity)*0.008;
 
-function animateRain() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drops.forEach(d => {
-    ctx.beginPath();
-    ctx.moveTo(d.x, d.y);
-    ctx.lineTo(d.x + d.wind, d.y + d.len);
-    ctx.strokeStyle = `rgba(160,200,230,${d.opacity})`;
-    ctx.lineWidth = 0.8;
-    ctx.stroke();
-    d.y += d.speed;
-    d.x += d.wind * 0.3;
-    if (d.y > canvas.height) {
-      d.y = -d.len;
-      d.x = Math.random() * canvas.width;
-    }
+  rCtx.clearRect(0,0,rainCv.width,rainCv.height);
+  drops.forEach(d=>{
+    rCtx.beginPath();
+    rCtx.moveTo(d.x,d.y);
+    rCtx.lineTo(d.x+d.wind,d.y+d.len);
+    rCtx.strokeStyle=`rgba(160,200,230,${d.opacity*rainIntensity})`;
+    rCtx.lineWidth=0.8; rCtx.stroke();
+    d.y+=d.speed; d.x+=d.wind*0.3;
+    if(d.y>rainCv.height){ d.y=-d.len; d.x=Math.random()*rainCv.width; }
   });
   requestAnimationFrame(animateRain);
 }
 
-// ── CONDENSATION DROPS ─────────────────────────────────────────────────────
-const cond = document.getElementById('condensation');
-for (let i = 0; i < 18; i++) {
-  const d = document.createElement('div');
-  d.className = 'drop';
-  const w = Math.random() * 4 + 2;
-  d.style.cssText = `
-    width:${w}px; height:${w * 1.8}px;
-    left:${Math.random() * 95}%;
-    top:${Math.random() * 20}%;
-    animation-duration:${Math.random() * 6 + 8}s;
-    animation-delay:${Math.random() * 10}s;
-  `;
+// ── CONDENSATION ───────────────────────────────────────────────────────────
+const cond=document.getElementById('condensation');
+for(let i=0;i<20;i++){
+  const d=document.createElement('div'); d.className='cdrop';
+  const w=Math.random()*4+2;
+  d.style.cssText=`width:${w}px;height:${w*1.8}px;left:${Math.random()*95}%;top:${Math.random()*25}%;animation-duration:${Math.random()*6+8}s;animation-delay:${Math.random()*12}s;`;
   cond.appendChild(d);
 }
 
 // ── CITY LIGHTS ────────────────────────────────────────────────────────────
-const cityLights = document.getElementById('cityLights');
-const warmColors = ['#ffd080','#ffb840','#ffe0a0','#fff0c0','#d0e0ff'];
-for (let i = 0; i < 60; i++) {
-  const l = document.createElement('div');
-  l.className = 'city-light';
-  l.style.cssText = `
-    left:${Math.random() * 98}%;
-    top:${20 + Math.random() * 60}%;
-    width:${Math.random() * 3 + 1}px;
-    height:${Math.random() * 3 + 1}px;
-    background:${warmColors[Math.floor(Math.random() * warmColors.length)]};
-    animation-duration:${Math.random() * 4 + 3}s;
-    animation-delay:${Math.random() * 5}s;
-  `;
-  cityLights.appendChild(l);
+const cl=document.getElementById('cityLights');
+const wc=['#ffd080','#ffb840','#ffe0a0','#fff0c0','#c8d8ff'];
+for(let i=0;i<65;i++){
+  const l=document.createElement('div'); l.className='city-light';
+  l.style.cssText=`left:${Math.random()*98}%;top:${15+Math.random()*65}%;width:${Math.random()*3+1}px;height:${Math.random()*3+1}px;background:${wc[Math.floor(Math.random()*wc.length)]};animation-duration:${Math.random()*4+3}s;animation-delay:${Math.random()*5}s;`;
+  cl.appendChild(l);
 }
 
-// ── INIT ───────────────────────────────────────────────────────────────────
-resizeCanvas();
-initRain();
-animateRain();
-window.addEventListener('resize', () => { resizeCanvas(); initRain(); });
-</script>
+// ── DUST MOTES ─────────────────────────────────────────────────────────────
+const motesEl=document.getElementById('motes');
+function spawnMote(){
+  const m=document.createElement('div'); m.className='mote';
+  const sz=Math.random()*2+1;
+  const dx=(Math.random()-0.5)*80, dy=-(Math.random()*60+30);
+  m.style.cssText=`
+    width:${sz}px; height:${sz}px;
+    left:${Math.random()*100}%; bottom:${10+Math.random()*40}%;
+    --mx:${dx}px; --my:${dy}px;
+    animation-duration:${6+Math.random()*8}s;
+    animation-delay:${Math.random()*4}s;
+    opacity:0;
+  `;
+  motesEl.appendChild(m);
+  setTimeout(()=>m.remove(), 16000);
+}
+// Keep roughly 12 motes alive at a time
+setInterval(spawnMote, 1200);
+for(let i=0;i<10;i++) setTimeout(spawnMote, i*600);
 
+// ── INIT ───────────────────────────────────────────────────────────────────
+resizeRain(); initDrops(); animateRain();
+window.addEventListener('resize',()=>{ resizeRain(); initDrops(); });
+</script>
 </body>
 </html>
